@@ -150,5 +150,13 @@ services:
       payment-service:
         condition: service_started
 
+  cron-service:
+    build:
+      context: ./cron-service
+    container_name: payasyougo-cron
+    ports:
+      - "8083:8083"
+    restart: unless-stopped
+
 volumes:
   postgres_data:
