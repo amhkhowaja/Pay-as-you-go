@@ -1,0 +1,22 @@
+# Build artifacts
+.build/
+*/bin/
+*/build/
+*.jar
+
+# Gradle
+.gradle/
+.kotlin/
+
+# IDE
+.idea/
+
+# Environment (contains secrets)
+.env
+frontend/.env
+
+# Node
+frontend/node_modules/
+
+# OS
+.DS_Store
