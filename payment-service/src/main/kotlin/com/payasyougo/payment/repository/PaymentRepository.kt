@@ -1,11 +1,12 @@
 package com.payasyougo.payment.repository
 
 import com.payasyougo.payment.model.Payment
-import org.springframework.data.mongodb.repository.MongoRepository
+import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
+import java.util.UUID
 
 @Repository
-interface PaymentRepository : MongoRepository<Payment, String> {
+interface PaymentRepository : JpaRepository<Payment, UUID> {
     fun findByStripePaymentIntentId(stripePaymentIntentId: String): Payment?
     fun findBySubscriptionId(subscriptionId: String): Payment?
 }

@@ -1,15 +1,25 @@
 package com.example.user.userservice.model
 
-import org.bson.types.ObjectId
-import org.springframework.data.annotation.Id
-import org.springframework.data.mongodb.core.mapping.Document
+import jakarta.persistence.*
 import java.time.Instant
+import java.util.UUID
 
-@Document(collection = "users")
-data class User (
-    @Id val id: String = ObjectId().toHexString(),
-    val keycloakUserId: String,
-    val username: String,
-    val email: String,
-    val createdAt: Instant
+@Entity
+@Table(name = "users")
+class User(
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    var id: UUID? = null,
+
+    @Column(nullable = false, unique = true)
+    var keycloakUserId: String = "",
+
+    @Column(nullable = false)
+    var username: String = "",
+
+    @Column(nullable = false, unique = true)
+    var email: String = "",
+
+    @Column(nullable = false)
+    var createdAt: Instant = Instant.now()
 )

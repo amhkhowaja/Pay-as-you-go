@@ -1,11 +1,8 @@
 package com.example.billingservice.billing.controller
 
 import com.example.billingservice.billing.dto.CreateSubscriptionRequest
-import com.example.billingservice.billing.model.BillingPlans
 import com.example.billingservice.billing.model.Subscriptions
-import com.example.billingservice.billing.repository.SubscriptionRepository
 import com.example.billingservice.billing.service.SubscriptionService
-import org.bson.types.ObjectId
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -27,7 +24,7 @@ class SubscriptionController(private val subscriptionService: SubscriptionServic
     @PostMapping("/subscriptions")
     fun createSubscription(@RequestBody subscriptionRequest: CreateSubscriptionRequest): ResponseEntity<String> {
         val subscription = subscriptionService.createSubscription(subscriptionRequest)
-        return ResponseEntity.ok(subscription.id)
+        return ResponseEntity.ok(subscription.id.toString())
     }
     
     @PostMapping("/webhooks/payment-success")
@@ -38,4 +35,3 @@ class SubscriptionController(private val subscriptionService: SubscriptionServic
         return ResponseEntity.ok("Subscription activated")
     }
 }
-

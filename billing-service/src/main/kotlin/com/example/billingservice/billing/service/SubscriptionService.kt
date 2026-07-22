@@ -8,12 +8,11 @@ import com.example.billingservice.billing.model.SubscriptionStatus
 import com.example.billingservice.billing.model.Subscriptions
 import com.example.billingservice.billing.repository.BillingPlanRepository
 import com.example.billingservice.billing.repository.SubscriptionRepository
-import org.bson.types.ObjectId
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
+import java.util.UUID
 
 @Service
 class SubscriptionService(
@@ -57,7 +56,7 @@ class SubscriptionService(
         // Create payment with actual subscription ID
         val paymentRequest = PaymentRequest(
             userId = subscriptionRequest.userId,
-            subscriptionId = savedSubscription.id,
+            subscriptionId = savedSubscription.id.toString(),
             amount = (billingPlan.price * 100).toLong(),
             currency = "usd"
         )
@@ -74,14 +73,17 @@ class SubscriptionService(
     }
     
     fun activateSubscription(subscriptionId: String) {
-        val subscription = subscriptionRepository.findById(subscriptionId)
+        val uuid = try {
+            UUID.fromString(subscriptionId)
+        } catch (e: IllegalArgumentException) {
+            throw IllegalArgumentException("Invalid subscription ID format")
+        }
+        val subscription = subscriptionRepository.findById(uuid)
             .orElseThrow { IllegalArgumentException("Subscription not found") }
         
-        val updatedSubscription = subscription.copy(
-            status = SubscriptionStatus.ACTIVE,
-            updatedAt = Instant.now()
-        )
-        subscriptionRepository.save(updatedSubscription)
+        subscription.status = SubscriptionStatus.ACTIVE
+        subscription.updatedAt = Instant.now()
+        subscriptionRepository.save(subscription)
     }
 
     private fun getSubscriptionEndData(startDate: Instant, billingCycle: BillingCycle?) : Instant {

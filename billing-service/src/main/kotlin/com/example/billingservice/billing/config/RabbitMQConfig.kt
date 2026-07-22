@@ -38,7 +38,9 @@ class RabbitMQConfig {
     }
 
     @Bean
-    fun listenerAdapter(receiver: com.example.billingservice.billing.messaging.PaymentEventListener): MessageListenerAdapter {
-        return MessageListenerAdapter(receiver, "receiveMessage")
+    fun listenerAdapter(receiver: com.example.billingservice.billing.messaging.PaymentEventListener, messageConverter: MessageConverter): MessageListenerAdapter {
+        val adapter = MessageListenerAdapter(receiver, "receiveMessage")
+        adapter.setMessageConverter(messageConverter)
+        return adapter
     }
 }

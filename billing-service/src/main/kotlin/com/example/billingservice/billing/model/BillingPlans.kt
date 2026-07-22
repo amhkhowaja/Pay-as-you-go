@@ -1,17 +1,29 @@
 package com.example.billingservice.billing.model
 
-import org.bson.types.Decimal128
-import org.bson.types.ObjectId
-import org.springframework.data.annotation.Id
-import org.springframework.data.mongodb.core.mapping.Document
+import jakarta.persistence.*
 import java.time.Instant
+import java.util.UUID
 
-@Document(collection = "BillingPlans")
-data class BillingPlans (
-    @Id val id : String = ObjectId().toHexString(),
-    val name: String,
-    val price : Int,
-    val billingCycle: BillingCycle,
-    val createdAt: Instant,
-    val updatedAt: Instant
+@Entity
+@Table(name = "billing_plans")
+class BillingPlans(
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    var id: UUID? = null,
+
+    @Column(nullable = false)
+    var name: String = "",
+
+    @Column(nullable = false)
+    var price: Int = 0,
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    var billingCycle: BillingCycle = BillingCycle.MONTHLY,
+
+    @Column(nullable = false)
+    var createdAt: Instant = Instant.now(),
+
+    @Column(nullable = false)
+    var updatedAt: Instant = Instant.now()
 )

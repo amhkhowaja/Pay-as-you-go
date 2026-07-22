@@ -1,9 +1,10 @@
 package com.example.user.userservice.repository
 
 import com.example.user.userservice.model.User
-import org.springframework.data.mongodb.repository.MongoRepository
+import org.springframework.data.jpa.repository.JpaRepository
+import java.util.UUID
 
-interface UserRepository: MongoRepository<User, String> {
+interface UserRepository: JpaRepository<User, UUID> {
     fun findByKeycloakUserId(keycloakUserId: String): User?
     fun findByEmail(email: String): User?
 }

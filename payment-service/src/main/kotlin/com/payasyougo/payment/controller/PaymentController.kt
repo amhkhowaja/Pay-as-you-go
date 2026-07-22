@@ -22,6 +22,12 @@ class PaymentController(private val paymentService: PaymentService) {
         return ResponseEntity.ok(response)
     }
 
+    @PostMapping("/confirm/{subscriptionId}")
+    fun confirmPayment(@PathVariable subscriptionId: String): ResponseEntity<String> {
+        paymentService.confirmPayment(subscriptionId)
+        return ResponseEntity.ok("Payment confirmed")
+    }
+
     @PostMapping("/webhook")
     fun handleWebhook(
         @RequestBody payload: String,

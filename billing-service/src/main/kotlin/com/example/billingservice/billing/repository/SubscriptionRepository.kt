@@ -1,9 +1,11 @@
 package com.example.billingservice.billing.repository
 
 import com.example.billingservice.billing.model.Subscriptions
-import org.springframework.data.mongodb.repository.MongoRepository
+import com.example.billingservice.billing.model.SubscriptionStatus
+import org.springframework.data.jpa.repository.JpaRepository
+import java.util.UUID
 
-interface SubscriptionRepository: MongoRepository<Subscriptions, String> {
+interface SubscriptionRepository: JpaRepository<Subscriptions, UUID> {
     fun findByUserId(userId: String): List<Subscriptions>
-    fun findByUserIdAndPlanIdAndStatus(userId: String, planId: String, status: com.example.billingservice.billing.model.SubscriptionStatus): Subscriptions?
+    fun findByUserIdAndPlanIdAndStatus(userId: String, planId: String, status: SubscriptionStatus): Subscriptions?
 }

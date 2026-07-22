@@ -50,7 +50,7 @@ class PaymentService(
         val saved = paymentRepository.save(payment)
 
         return PaymentResponse(
-            paymentId = saved.id!!,
+            paymentId = saved.id.toString(),
             status = saved.status.name,
             clientSecret = paymentIntent.clientSecret
         )
@@ -61,10 +61,27 @@ class PaymentService(
             ?: throw IllegalArgumentException("Payment not found for subscription: $subscriptionId")
         
         return PaymentResponse(
-            paymentId = payment.id!!,
+            paymentId = payment.id.toString(),
             status = payment.status.name,
             clientSecret = PaymentIntent.retrieve(payment.stripePaymentIntentId).clientSecret
         )
+    }
+
+    fun confirmPayment(subscriptionId: String) {
+        val payment = paymentRepository.findBySubscriptionId(subscriptionId)
+            ?: throw IllegalArgumentException("Payment not found for subscription: $subscriptionId")
+        
+        val stripeId = payment.stripePaymentIntentId
+            ?: throw IllegalStateException("No Stripe payment intent ID found")
+        
+        // Verify with Stripe that payment actually succeeded
+        val paymentIntent = PaymentIntent.retrieve(stripeId)
+        if (paymentIntent.status == "succeeded") {
+            updatePaymentStatus(stripeId, PaymentStatus.SUCCEEDED)
+            notifyBillingService(subscriptionId)
+        } else {
+            throw IllegalStateException("Payment not yet confirmed by Stripe. Status: ${paymentIntent.status}")
+        }
     }
 
     fun handleWebhook(payload: String, signature: String): String {
@@ -113,8 +130,10 @@ class PaymentService(
     }
 
     private fun updatePaymentStatus(stripePaymentIntentId: String, status: PaymentStatus) {
-        paymentRepository.findByStripePaymentIntentId(stripePaymentIntentId)?.let {
-            paymentRepository.save(it.copy(status = status, updatedAt = java.time.Instant.now()))
+        paymentRepository.findByStripePaymentIntentId(stripePaymentIntentId)?.let { payment ->
+            payment.status = status
+            payment.updatedAt = java.time.Instant.now()
+            paymentRepository.save(payment)
         }
     }
 }

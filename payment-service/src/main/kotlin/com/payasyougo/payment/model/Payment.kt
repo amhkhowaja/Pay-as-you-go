@@ -1,21 +1,40 @@
 package com.payasyougo.payment.model
 
-import org.springframework.data.annotation.Id
-import org.springframework.data.mongodb.core.mapping.Document
+import jakarta.persistence.*
 import java.time.Instant
+import java.util.UUID
 
-@Document(collection = "payments")
-data class Payment(
+@Entity
+@Table(name = "payments")
+class Payment(
     @Id
-    val id: String? = null,
-    val userId: String,
-    val subscriptionId: String,
-    val amount: Long,
-    val currency: String = "usd",
-    val stripePaymentIntentId: String? = null,
-    val status: PaymentStatus = PaymentStatus.PENDING,
-    val createdAt: Instant = Instant.now(),
-    val updatedAt: Instant = Instant.now()
+    @GeneratedValue(strategy = GenerationType.UUID)
+    var id: UUID? = null,
+
+    @Column(nullable = false)
+    var userId: String = "",
+
+    @Column(nullable = false)
+    var subscriptionId: String = "",
+
+    @Column(nullable = false)
+    var amount: Long = 0,
+
+    @Column(nullable = false)
+    var currency: String = "usd",
+
+    @Column(unique = true)
+    var stripePaymentIntentId: String? = null,
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    var status: PaymentStatus = PaymentStatus.PENDING,
+
+    @Column(nullable = false)
+    var createdAt: Instant = Instant.now(),
+
+    @Column(nullable = false)
+    var updatedAt: Instant = Instant.now()
 )
 
 enum class PaymentStatus {

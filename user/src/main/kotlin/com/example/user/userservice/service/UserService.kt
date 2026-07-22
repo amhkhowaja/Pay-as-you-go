@@ -4,16 +4,21 @@ import com.example.user.userservice.dto.CreateUserRequest
 import com.example.user.userservice.dto.UserResponse
 import com.example.user.userservice.model.User
 import com.example.user.userservice.repository.UserRepository
-import org.bson.types.ObjectId
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
+import java.util.UUID
 
 @Service
 class UserService(val userRepository: UserRepository) {
     
     fun getUserById(userId: String): UserResponse {
-        val user: User = userRepository.findById(userId).orElseThrow {
+        val uuid = try {
+            UUID.fromString(userId)
+        } catch (e: IllegalArgumentException) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid user ID format")
+        }
+        val user: User = userRepository.findById(uuid).orElseThrow {
             ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
         }
         return user.toGetUserResponse()
@@ -74,7 +79,7 @@ class UserService(val userRepository: UserRepository) {
 
 private fun User.toGetUserResponse(): UserResponse {
     return UserResponse(
-        id = this.id,
+        id = this.id.toString(),
         email = this.email,
         createdAt = this.createdAt,
         username = this.username,

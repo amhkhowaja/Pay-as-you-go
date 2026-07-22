@@ -6,7 +6,7 @@ import { Elements, CardElement, useStripe, useElements } from '@stripe/react-str
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
 const PAYMENT_SERVICE_URL = import.meta.env.VITE_PAYMENT_SERVICE_URL || 'http://localhost:8082'
 
-function CheckoutForm({ clientSecret, subscriptionId }) {
+function CheckoutForm({ clientSecret, subscriptionId, keycloak }) {
   const stripe = useStripe()
   const elements = useElements()
   const navigate = useNavigate()
@@ -31,6 +31,15 @@ function CheckoutForm({ clientSecret, subscriptionId }) {
         setError(stripeError.message)
         setProcessing(false)
       } else {
+        // Notify backend that payment succeeded
+        try {
+          await fetch(`${PAYMENT_SERVICE_URL}/payments/confirm/${subscriptionId}`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${keycloak.token}` }
+          })
+        } catch (err) {
+          console.warn('Payment confirmed with Stripe but backend notification failed:', err)
+        }
         navigate('/dashboard')
       }
     } catch (err) {
@@ -132,7 +141,7 @@ export default function Payment({ keycloak }) {
       <h1 style={{ textAlign: 'center', marginBottom: '2rem' }}>Payment</h1>
       {clientSecret && (
         <Elements stripe={stripePromise}>
-          <CheckoutForm clientSecret={clientSecret} subscriptionId={subscriptionId} />
+          <CheckoutForm clientSecret={clientSecret} subscriptionId={subscriptionId} keycloak={keycloak} />
         </Elements>
       )}
     </div>

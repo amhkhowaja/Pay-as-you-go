@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "2.2.21"
     kotlin("plugin.spring") version "2.2.21"
+    kotlin("plugin.jpa") version "2.2.21"
     id("org.springframework.boot") version "4.0.3"
     id("io.spring.dependency-management") version "1.1.7"
 }
@@ -20,15 +21,17 @@ repositories {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.postgresql:postgresql")
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-amqp")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("tools.jackson.module:jackson-module-kotlin")
-    testImplementation("org.springframework.boot:spring-boot-starter-data-mongodb-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.0")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.0")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
